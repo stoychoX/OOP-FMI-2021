@@ -1,0 +1,2 @@
+In order to run properly, you'd need to get the free crypt lib:
+https://github.com/trusch/libbcrypt
