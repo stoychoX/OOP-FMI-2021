@@ -1,4 +1,4 @@
-# namespase-psn
+# personal classes
 Personal classes which might come handy.
 
 # vector:
