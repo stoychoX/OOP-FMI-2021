@@ -1,4 +1,4 @@
-# personal classes
+# Personal classes
 Personal classes which might come handy.
 
 # vector:
