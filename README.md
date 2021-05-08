@@ -1,17 +1,28 @@
 # Personal classes
-Personal classes which might come handy.
+Personal classes and projects, which I made taking the OOP course in FMI Sofia.
 
-# vector:
+## vector
+___
 A dynamic array class, having the main functionality of std::vector.
-## Added functionality
-* Supports getting subsets from already existing vector<T>.
-* Supports intersection of two vectors.
-* Inserting arrays T* by .insertList
-* Erasing element from vector
-* Finding element
-* Contain(T) function
+### Added
+* Getting subsets from already existing vector<T>.
+* Intersection of two vectors.
+* Inserting arrays T* by .insertList.
+* Erasing element from vector.
+* Finding element.
+* Finding if the container has certain element.
 
-# Queue:
-A simple queue class, having the main functionality of std::queue
-## kPriorityQueue:
-A priority queue, supporting adding elements with priority. First popped are the elements with higher priority.
+## Queue:
+___
+A simple queue class, having the main functionality of std::queue.
+### kPriorityQueue:
+Queue, in which each element additionally has a "priority" associated with it.
+
+## Chat system
+___
+Project, which imitates chat system. The project supports:
+* Multiple users.
+* Sending and receive messages as well as viewing them.
+* Deleting accounts.
+* No data lost.
+* Crypt lib needed in order to run properly (link in src).
