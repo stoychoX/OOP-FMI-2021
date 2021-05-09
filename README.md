@@ -26,3 +26,7 @@ Project, which imitates chat system. The project supports:
 * Deleting accounts.
 * No data lost.
 * Crypt lib needed in order to run properly (link in src).
+
+## string
+---
+A simple string class, having the main functionality of std::string.
