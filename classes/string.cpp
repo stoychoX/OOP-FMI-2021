@@ -384,7 +384,7 @@ bool string::operator>=(const string& other) const {
 }
 
 bool string::operator<=(const string& other) const {
-	return ((this == &other) || (this > & other));
+	return ((this == &other) || (this < &other));
 }
 
 string::~string() {
