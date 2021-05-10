@@ -1,6 +1,3 @@
-# Personal classes
-Personal classes and projects, which I made taking the OOP course in FMI Sofia.
-
 ## vector
 ___
 A dynamic array class, having the main functionality of std::vector.
