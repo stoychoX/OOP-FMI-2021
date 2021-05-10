@@ -7,9 +7,9 @@ A dynamic array class, having the main functionality of std::vector.
 ### Added
 * Getting subsets from already existing vector<T>.
 * Intersection of two vectors.
-* Inserting arrays T* by .insertList.
+* Inserting arrays of type T* by .insertList.
 * Erasing element from vector.
-* Finding element.
+* Finding element in vector.
 * Finding if the container has certain element.
 
 ## Queue:
@@ -24,7 +24,7 @@ Project, which imitates chat system. The project supports:
 * Multiple users.
 * Sending and receive messages as well as viewing them.
 * Deleting accounts.
-* No data lost.
+* No data lost after closing the console.
 * Crypt lib needed in order to run properly (link in src).
 
 ## string
