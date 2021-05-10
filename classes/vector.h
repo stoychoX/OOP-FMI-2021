@@ -143,10 +143,6 @@ public:
 	~vector();
 
 	//print methods:
-	/*Definition of operator << outside a class is a funcion template,
-	* but if you define it inside a class it is not.
-	* That's why we need to template it ourselves.
-	*/
 	template <class U>
 	friend std::ostream& operator<< (std::ostream& os, const vector<U>& vect);
 
