@@ -1,7 +1,7 @@
-## vector
+# vector
 ___
 A dynamic array class, having the main functionality of std::vector.
-### Added
+## Added
 * Getting subsets from already existing vector<T>.
 * Intersection of two vectors.
 * Inserting arrays of type T* by .insertList.
@@ -9,13 +9,13 @@ A dynamic array class, having the main functionality of std::vector.
 * Finding element in vector.
 * Finding if the container has certain element.
 
-## Queue:
+# Queue:
 ___
 A simple queue class, having the main functionality of std::queue.
-### kPriorityQueue:
+## kPriorityQueue:
 Queue, in which each element additionally has a "priority" associated with it.
 
-## Chat system
+# Chat system
 ___
 Project, which imitates chat system. The project supports:
 * Multiple users.
@@ -24,6 +24,6 @@ Project, which imitates chat system. The project supports:
 * No data lost after closing the console.
 * Crypt lib needed in order to run properly (link in src).
 
-## string
+# string
 ---
 A simple string class, having the main functionality of std::string.
