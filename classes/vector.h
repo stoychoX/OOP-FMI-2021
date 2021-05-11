@@ -1,6 +1,6 @@
 //
 //Created by 82275 on 27.04.2021
-//partly using code used in recent OOP seminars (FMI Sofia).
+//partly using code written in recent OOP seminars (FMI Sofia).
 //
 #pragma once
 #include<iostream>
