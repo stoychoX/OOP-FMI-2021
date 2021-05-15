@@ -460,10 +460,8 @@ void vector<T>::resize(const size_t& newSize) {
 	if (newCapacity < growth)
 		newCapacity = growth;
 
-	reserve(newSize);
-
+	//reserve(newSize); constructRange(this->value + this->size, this->value + newSize); removed!!
 	T* newData = copyDynamic(value, size, newCapacity);
-	constructRange(this->value + this->size, this->value + newSize);
 	freeRange(value, value + size);
 
 	value = newData;
