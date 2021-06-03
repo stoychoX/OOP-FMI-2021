@@ -112,7 +112,7 @@ void compose(User* sender, User* reciever) {
 	m.saveMessageToFile(messageLoc);
 }
 
-//showing uyser related options
+//showing user related options
 void showUserDialog(Database& data, User& user) {
 	std::cout << "Successfully logged in!\n";
 	user.printSafe(std::cout);
