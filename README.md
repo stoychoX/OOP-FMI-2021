@@ -28,5 +28,5 @@ Project, which imitates chat system. The project supports:
 ---
 A simple string class, having the main functionality of std::string.
   
-#snake-game
+# snake-game
   Really simple snake game following the OOP principles.
