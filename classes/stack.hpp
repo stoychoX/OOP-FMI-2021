@@ -124,7 +124,7 @@ inline void stack<T>::copy(const stack<T>& other) {
 			this->data[i] = other.data[i];
 	}
 	catch (...) {
-		free();
+		clear();
 		throw;
 	}
 }
