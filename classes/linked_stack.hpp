@@ -1,5 +1,5 @@
 /*****************************
-Stack implementation.
+Linked stack implementation.
 18 september 2021.
 ******************************/
 #include<exception>
