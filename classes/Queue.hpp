@@ -180,8 +180,7 @@ inline bool Queue<T>::operator==(const Queue& toCmp) const {
 
 		return true;
 	}
-	else
-		return eq;
+	return false;
 }
 
 template<class T>
