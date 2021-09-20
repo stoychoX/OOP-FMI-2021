@@ -170,9 +170,9 @@ inline queue<T>::~queue() {
 
 template<class T>
 inline void queue<T>::free() {
-	while (tail) {
-		Node<T>* toRemove = tail;
-		tail = tail->next;
+	while (head) {
+		Node<T>* toRemove = head;
+		head = head->next;
 		delete toRemove;
 	}
 }
