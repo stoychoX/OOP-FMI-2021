@@ -144,7 +144,6 @@ inline void linked_list<T>::push_at_end(const T& arg) {
 	push_at(arg, size);
 }
 
-//whole logic of inserion is collected at one place:
 template<class T>
 inline void linked_list<T>::push_at(const T& arg, unsigned index) {
 	if (index > size)
@@ -269,7 +268,7 @@ inline void linked_list<T>::copy(const linked_list<T>& other) {
 	Node<T>* it = other.first;
 	try {
 		while (it) {
-			T arg = it->data; //might throw
+			T arg = it->data;
 			this->push_at_end(arg);
 			it = it->next;
 		}
