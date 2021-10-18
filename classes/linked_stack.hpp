@@ -138,12 +138,19 @@ inline stack<T>::~stack() {
 
 template<class T>
 inline void stack<T>::copy(const stack<T>& other) {
-	Node<T>* it = other.tos;
+	this->tos = nullptr;
 
-	while (it) {
-		this->push(it->data);
+	T* arr = new T[other.size];
+	Node<T>* it = other.tos;
+	for (int i = 0; i < other.size; i++) {
+		arr[i] = it->data;
 		it = it->next;
 	}
+
+	for (int i = other.size - 1; i >= 0; --i)
+		this->push(arr[i]);
+	
+	delete[] arr;
 }
 
 template<class T>
