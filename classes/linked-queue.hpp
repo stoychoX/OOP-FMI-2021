@@ -88,6 +88,7 @@ inline queue<T>& queue<T>::operator=(const queue<T>& other) {
 
 template<class T>
 inline queue<T>& queue<T>::operator=(queue<T>&& other) {
+	if(this!=&other){
 	clear();
 
 	this->head = other.head;
@@ -96,6 +97,7 @@ inline queue<T>& queue<T>::operator=(queue<T>&& other) {
 
 	other.head = other.tail = nullptr;
 	other.size = 0;
+	}
 
 	return *this;
 }
