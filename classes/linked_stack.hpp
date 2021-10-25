@@ -83,11 +83,14 @@ inline stack<T>& stack<T>::operator=(const stack<T>& other) {
 
 template<class T>
 inline stack<T>& stack<T>::operator=(stack<T>&& other) {
+	if(this != &other){
 	this->tos = other.tos;
 	this->size = other.size;
 	
 	other.tos = nullptr;
 	other.size = 0;
+	}
+	return *this;
 }
 
 template<class T>
