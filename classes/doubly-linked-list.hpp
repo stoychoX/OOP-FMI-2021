@@ -118,8 +118,6 @@ public:
 	const T& front() const;
 	T back();
 	T front();
-	
-	//no at(index);
 
 	//helpers
 	int length() const;
@@ -192,7 +190,6 @@ void doublyLinkedList<T>::free() {
 
 template<class T>
 void doublyLinkedList<T>::copyFrom(const doublyLinkedList<T>& other) {
-	//TODO EXCEPTION SAFETY??
 	doublyLinkedNode<T>* it = other.tail;
 	while (it) {
 		this->pushBack(it->data);
@@ -208,7 +205,7 @@ void doublyLinkedList<T>::pushAt(const T& arg, int index) {
 
 	doublyLinkedNode<T>* toAdd = new doublyLinkedNode<T>(arg);
 
-	if (index == 0) { //push back = tail
+	if (index == 0) {
 		if (tail == nullptr) {
 			tail = head = toAdd;
 		}
@@ -218,7 +215,7 @@ void doublyLinkedList<T>::pushAt(const T& arg, int index) {
 			tail = toAdd;
 		}
 	}
-	else if (index == size) { //push front = head
+	else if (index == size) {
 		head->next = toAdd;
 		toAdd->prev = head;
 		head = toAdd;
@@ -316,7 +313,7 @@ int doublyLinkedList<T>::length() const {
 
 template<class T>
 bool doublyLinkedList<T>::isEmpty() const {
-	return !size; //nullptr
+	return !size;
 }
 
 template<class T>
