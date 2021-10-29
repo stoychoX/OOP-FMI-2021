@@ -30,7 +30,7 @@ public:
 	doublyLinkedListIterator(doublyLinkedNode<T>* arg) : current(arg) {}
 	
 	Iterator& operator++() {
-		if (current->next == nullptr) {
+		if (current == nullptr) {
 			return *this;
 		}
 
@@ -39,7 +39,7 @@ public:
 	}
 
 	Iterator& operator++(int) {
-		if (current->next == nullptr) {
+		if (current == nullptr) {
 			return *this;
 		}
 		Iterator it = *this;
@@ -48,7 +48,7 @@ public:
 	}
 
 	Iterator& operator--() {
-		if (current->prev == nullptr) {
+		if (current == nullptr) {
 			return *this;
 		}
 
@@ -57,7 +57,7 @@ public:
 	}
 
 	Iterator& operator--(int) {
-		if (current->prev == nullptr) {
+		if (current == nullptr) {
 			return *this;
 		}
 		Iterator it = *this;
@@ -129,7 +129,7 @@ public:
 	}
 
 	doublyLinkedListIterator<T> end() {
-		return doublyLinkedListIterator<T>(head);
+		return doublyLinkedListIterator<T>(nullptr);
 	}
 
 	~doublyLinkedList();
