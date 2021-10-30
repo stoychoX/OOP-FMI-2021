@@ -88,7 +88,7 @@ class doublyLinkedList {
 private:
 	doublyLinkedNode<T>* head;
 	doublyLinkedNode<T>* tail;
-	int size;
+	size_t size;
 
 	void copyFrom(const doublyLinkedList<T>& other);
 	void free();
@@ -116,11 +116,9 @@ public:
 	//extract operations:
 	const T& back() const;
 	const T& front() const;
-	T back();
-	T front();
 
 	//helpers
-	int length() const;
+	size_t length() const;
 	bool isEmpty() const;
 
 	//iterate:
