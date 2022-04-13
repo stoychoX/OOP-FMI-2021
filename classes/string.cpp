@@ -416,9 +416,13 @@ std::ostream& operator<<(std::ostream& os, const string& arg) {
 	return os;
 }
 
+// To be fixed!!!
 std::istream& operator>>(std::istream& is, string& arg) {
-	char* toSet = new char[1024]; toSet[0] = '\0';
+	char toSet[1024];
+	
 	is >> toSet;
+	
 	arg = string(toSet);
+	
 	return is;
 }
