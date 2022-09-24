@@ -1,158 +1,170 @@
-//
-//Created by 82275 on 27.04.2021
-//partly using code written in recent OOP seminars (FMI Sofia).
-//
-#pragma once
-#include<iostream>
+/********************************************************************
+* Created by 82275 on 27.04.2021
+* using code written in recent OOP seminars (FMI Sofia).
+********************************************************************/
+
+#ifndef VECTOR_HEADER
+#define VECTOR_HEADER
+
+const size_t INITIAL_CAPACITY = 16;
+const size_t GROWTH_CAPACITY = 2;
+
 #include<exception>
-
-const size_t INITIAL_CAPACITY = 1; //Default capacity of non-initialized class
-const size_t GROWTH_CAPACITY = 2; //Default value for growth capacity
-
-
-/*Why create a iterator?
-- To be able to use range based for loops*/
-template<class T>
-class iterator {
-public:
-	//using:
-	using _valType = typename T::_valType; //Fixing issues with handling types!
-	using _pntType = _valType*; //Last two aren't a must, making the code easier
-	using _refType = _valType&; //to read and understand.
-
-public:
-	iterator(_pntType passedVal) : memPointer(passedVal) {};
-	iterator(_pntType passedVal, const size_t _push) : memPointer(passedVal + _push) {};
-
-	iterator& operator++() {
-		memPointer++;
-		return *this;
-	}
-
-	iterator& operator++(int) {
-		iterator it = *this;
-		++(*this);
-		return it;
-	}
-
-	iterator& operator--() {
-		memPointer--;
-		return *this;
-	}
-
-	iterator& operator--(int) {
-		iterator it = *this;
-		--(*this);
-		return it;
-	}
-
-	_refType operator[](const size_t& index) {
-		return *(memPointer + index);
-	}
-
-	_pntType operator->() {
-		return *(memPointer);
-	}
-
-	_refType operator*() {
-		return *(memPointer);
-	}
-
-	bool operator==(const iterator& it) const {
-		return (this->memPointer == it.memPointer);
-	}
-
-	bool operator!=(const iterator& it) const {
-		return !(memPointer == it.memPointer);
-	}
-
-	bool operator>(const iterator& other) const {
-		return (memcmp(this, &other, sizeof(*this)) == 1);
-	}
-
-	bool operator<(const iterator& other) const {
-		return (memcmp(this, &other, sizeof(*this)) == -1);
-	}
-
-private:
-	_pntType memPointer;
-};
+#include<cassert>  
+#include<cstddef> // size_t
 
 template <class T>
 class vector {
+private:
+	class vector_iterator {
+	public:
+		using valType = T;
+		using pntType = valType*;
+		using refType = valType&;
+
+	public:
+		vector_iterator(pntType passedVal) : memPointer{passedVal} {};
+		vector_iterator(pntType passedVal, size_t _push) : memPointer{ passedVal + _push } {};
+
+		vector_iterator& operator++() {
+			memPointer++;
+			return *this;
+		}
+
+		vector_iterator& operator++(int) {
+			vector_iterator it = *this;
+			++(*this);
+			return it;
+		}
+
+		vector_iterator& operator--() {
+			memPointer--;
+			return *this;
+		}
+
+		vector_iterator& operator--(int) {
+			vector_iterator it = *this;
+			--(*this);
+			return it;
+		}
+
+		vector_iterator& operator+(int off) const {
+			vector_iterator res{ memPointer + off };
+			return res;
+		}
+
+		pntType operator->() {
+			return memPointer;
+		}
+
+		const pntType operator->() const {
+			return memPointer;
+		}
+
+		refType operator*() {
+			return *(memPointer);
+		}
+
+		const refType operator*() const {
+			return *(memPointer);
+		}
+
+		bool operator==(const vector_iterator& it) const {
+			return (this->memPointer == it.memPointer);
+		}
+
+		bool operator!=(const vector_iterator& it) const {
+			return !(memPointer == it.memPointer);
+		}
+
+		bool operator>(const vector_iterator& other) const {
+			return memPointer > other.memPointer;
+		}
+
+		bool operator<(const vector_iterator& other) const {
+			return memPointer < other.memPointer;
+		}
+	private:
+		pntType memPointer;
+		friend class vector;
+	};
+
 public:
-	using _valType = T;
-	using Iterator = iterator<vector<T>>; //making it just like STL: vector<T>::Iterator
+	using Iterator = vector_iterator;
+
 private:
 	T* value;
-	size_t size;
-	size_t capacity;
+	size_t v_size;
+	size_t v_capacity;
+
 public:
-	//constructors:
 	vector();
-	vector(const size_t& _Size);
+	explicit vector(const size_t& _Size);
 	vector(const size_t& _Size, const T& _Val);
 	vector(const vector& other);
-	vector(vector&& other);
+	vector(vector&& other) noexcept;
+	vector(Iterator Beg, Iterator End);
 
-	//operators = and ==
-	vector& operator=(vector& other) noexcept;
+	vector& operator=(const vector& other) noexcept;
 	vector& operator=(vector&& other) noexcept;
-	bool operator==(const vector& other) const;
-	bool operator!=(const vector& other) const;
 
-	//size related operations
 	void reserve(const size_t& newCapacity);
 	void resize(const size_t& newSize);
 	void clear() noexcept;
-	size_t Size() const;
-	size_t Capacity() const;
+	size_t size() const;
+	size_t capacity() const;
 	bool isEmpty() const;
 	void shrink_to_fit();
 
-	//insertion or removal operations:
 	void push_back(const T& value);
+	void move_back(T&& value);
 	void pop_back();
-	void insertList(const size_t& _Where, T* list, const size_t& sizeOfItems);
-	vector<T> operator+(const vector<T> other) const;
-	vector<T> intersec(const vector<T> other) const;
+	void insertList(size_t _Where, const T* list, size_t sizeOfItems);
+
+	const vector<T>& operator+(const vector<T>& other) const;
+	const vector<T>& intersec(vector<T> other) const;
 	vector<T>& operator+=(const vector<T>& other);
-	void erase(const T& obj); //new
+	void erase(Iterator at);
 
-	//getting items out of vector:
-	const T& operator[] (const size_t& index) const;
-	T& operator[] (const size_t& index);
-	vector<T> subset(const size_t& from, const size_t& to) const;
-	vector<T> inclusiveSubset(const size_t& from, const size_t& to) const;
-	vector<T> leftInclusiveSubset(const size_t& from, const size_t& to) const;
-	vector<T> rightInclusiveSubset(const size_t& from, const size_t& to) const;
+	const T& operator[] (size_t index) const;
+	T& operator[] (size_t index);
 
-	//iterators:
-	Iterator begin() const {
+	vector<T> subset(const Iterator& from, const Iterator& to) const;
+	void sort(int from, int to);
+	void sort();
+
+	Iterator begin() {
 		return Iterator(value);
 	}
-	Iterator end() const {
-		return Iterator(value + size);
+
+	Iterator end() {
+		return Iterator(value + v_size);
 	}
 
-	//find:
-	T find(Iterator beginRange, Iterator endRange, const T& item) const; //new
-	bool contains(const T& elem) const; //new
+	const Iterator& begin() const {
+		return Iterator(value);
+	}
 
-	//destroy:
+	const Iterator& end() const {
+		return Iterator(value + v_size);
+	}
+
+	const Iterator& c_begin() const {
+		return Iterator(value);
+	}
+
+	const Iterator& c_end() const {
+		return Iterator(value + v_size);
+	}
+
+	const Iterator& find(Iterator beginRange, Iterator endRange, const T& item) const;
+	const Iterator& find(const T&) const;
+	bool contains(const T& elem) const;
+
+	int distance(const Iterator& Beg, const Iterator& End) const;
+
 	~vector();
-
-	//print methods:
-	template <class U>
-	friend std::ostream& operator<< (std::ostream& os, const vector<U>& vect);
-
 private:
-	void printAll(std::ostream& os) const;
-
-	//swap:
-	void swapVectors(vector& first);
-	//memory allocators:
-
 	/*memalloc:
 	* Allocating memory of type T with _Size's capacity.
 	* Returning a pointer to the allocated memory.*/
@@ -171,8 +183,8 @@ private:
 		}
 	}
 
-	/*constructRange(T*,T*):
-	* Used to construct with default constructor objects directly in the memory, which is in between @param: begin and @param: end
+	/* constructRange(T*,T*):
+	*  Used to construct with default constructor objects directly in the memory, which is in between @param: begin and @param: end
 	*/
 	static void constructRange(T* begin, T* end) {
 		while (begin != end) {
@@ -184,7 +196,7 @@ private:
 	/*copyRange:
 	* Copying range of memory, which is between @param: begin and @param: end, to certan destination, pointed to eith @param: _Dest
 	*/
-	static void copyRange(T* begin, T* end, T* _Dest) {
+	static void copyRange(const T* begin, const T* end, T* _Dest) {
 		while (begin != end) {
 			new ((void*)_Dest) T(*begin);
 			begin++; _Dest++;
@@ -215,99 +227,156 @@ private:
 	*allocated with a given capacity represented by @param: newCapacity, and filled with
 	* elements from the current vector.
 	*/
-	T* copyDynamic(T* dataToCopyFrom, const size_t& sizeOfCopiedItems, const size_t& newCapacity) {
+	T* copyDynamic(T* dataToCopyFrom, const size_t& sizeOfCopiedItems, size_t newCapacity) {
 		T* newData = memalloc(newCapacity);
 		copyRange(dataToCopyFrom, dataToCopyFrom + sizeOfCopiedItems, newData);
 		return newData;
 	}
+
+	static void moveRange(T* begin, T* end, T* _Dest) {
+		while (begin != end) {
+			new ((void*)_Dest) T(std::move(*begin));
+			begin++; _Dest++;
+		}
+	}
+
+	T* moveDynamic(T* dataToCopyFrom, const size_t& sizeOfCopiedItems, size_t newCapacity) {
+		T* newData = memalloc(newCapacity);
+		moveRange(dataToCopyFrom, dataToCopyFrom + sizeOfCopiedItems, newData);
+		return newData;
+	}
+
+	size_t partition(T* data, size_t size);
+
+	void qsort(int from, int to);
+
+	int closestPowerOfTwo(int v) {
+		v--;
+		v |= v >> 1;
+		v |= v >> 2;
+		v |= v >> 4;
+		v |= v >> 8;
+		v |= v >> 16;
+		v++;
+		return v;
+	}
 };
 
-/*Default constructor: */
 template<class T>
-vector<T>::vector() : value(nullptr), size(0), capacity(0) {};
+vector<T>::vector() : value{ nullptr }, v_size{ 0 }, v_capacity{ 0 } {};
 
 /*
 * Allocating memory in the initialization list and constructing range.
 * @param: size is used to allocate vector with _Size elements.
 */
 template<class T>
-vector<T>::vector(const size_t& _Size) : value(memalloc(_Size)), size(_Size), capacity(_Size) {
-	constructRange(value, value + capacity);
+vector<T>::vector(const size_t& _Size) : value{ memalloc(_Size) }, v_size{ _Size }, v_capacity{ _Size } {
+	constructRange(value, value + v_capacity);
 };
 
 template<class T>
-vector<T>::vector(const size_t& _Size, const T& _Val) : value(memalloc(_Size)), size(_Size), capacity(_Size) {
-	constructRange(value, value + capacity, _Val);
+vector<T>::vector(const size_t& _Size, const T& _Val) : value{ memalloc(_Size) }, v_size{ _Size }, v_capacity{ _Size } {
+	constructRange(value, value + v_capacity, _Val);
 };
 
 template<class T>
-vector<T>::vector(const vector& other) : value(memalloc(other.capacity)), size(other.size), capacity(other.capacity) {
-	copyRange(other.value, other.value + size, value); //Getting the information we need in this->value.
+vector<T>::vector(const vector& other) : value{ memalloc(other.v_capacity) }, v_size{ other.v_size }, v_capacity{ other.v_capacity } {
+	copyRange(other.value, other.value + v_size, value);
 };
 
-/*Move constructor*/
 template<class T>
-vector<T>::vector(vector&& other) : value(other.value), size(other.size), capacity(other.capacity) {
+vector<T>::vector(vector&& other) noexcept : value{ other.value }, v_size{ other.v_size }, v_capacity{ other.v_capacity } {
 	other.value = nullptr;
-	other.size = 0;
+	other.v_size = 0;
 }
 
-//returning a copy of the element which you'd like to find and default element if there is no such element.
 template<class T>
-inline T vector<T>::find(Iterator beginRange, Iterator endRange, const T& item) const {
-	int cnt = 0;
-	while (beginRange != endRange) {
-		if (beginRange[cnt] == item)
-			return beginRange[cnt];
-		cnt++; ++beginRange;
-	}
-	return T();
+vector<T>::vector(Iterator Beg, Iterator End) {
+	int diff = distance(Beg, End);
+	assert(diff >= 0);
+	int cap = closestPowerOfTwo(diff);
+	value = copyDynamic(Beg.memPointer, diff, cap);
+	v_size = diff;
+	v_capacity = cap;
 }
 
-//returns true if the element is in, false otherwise
 template<class T>
-inline bool vector<T>::contains(const T& elem) const {
-	int cnt = 0;
-	Iterator begin = this->begin();
-	Iterator end = this->end();
-	while (begin != end) {
-		if (begin[cnt] == elem)
-			return true;
-		++cnt; ++begin;
-	}
-	return false;
+const typename vector<T>::Iterator& vector<T>::find(Iterator Beg, Iterator End, const T& item) const {
+	for (; Beg != End; ++Beg)
+		if (*Beg == item)
+			return Beg;
+
+	return end();
 }
 
-/*Destructor*/
+template<class T>
+const typename vector<T>::Iterator& vector<T>::find(const T& item) const {
+	return find(begin(), end(), item);
+}
+
+template<class T>
+bool vector<T>::contains(const T& elem) const {
+	return find(begin(), end(), elem) != end();
+}
+
 template<class T>
 vector<T>::~vector() {
-	freeRange(value, value + size);
+	freeRange(value, value + v_size);
 }
 
 template<class T>
-const T& vector<T>::operator[](const size_t& index) const {
-	if (index < 0 || index >= size)
+size_t vector<T>::partition(T* data, size_t collectionSize) {
+	size_t pp = 0;
+	T pivot = data[collectionSize - 1];
+
+	for (size_t i = 0; i < collectionSize - 1; i++)
+		if (data[i] < pivot)
+			std::swap(data[i], data[pp++]);
+
+	std::swap(data[pp], data[collectionSize - 1]);
+
+	return pp;
+}
+
+template<class T>
+void vector<T>::qsort(int from, int to) {
+	if (to - from + 1 < 2)
+		return;
+
+	size_t idx = partition(value + from, to - from + 1);
+	qsort(from, from + idx - 1);
+	qsort(from + idx + 1, to);
+}
+
+template<class T>
+int vector<T>::distance(const Iterator& Beg, const Iterator& End) const {
+	return End.memPointer - Beg.memPointer;
+}
+
+template<class T>
+const T& vector<T>::operator[](size_t index) const {
+	if (index >= v_size)
 		throw std::exception("Invalid index!");
 
-	return this->value[index];
+	return value[index];
 }
 
 template<class T>
-T& vector<T>::operator[](const size_t& index) {
-	if (index < 0 || index >= size)
+T& vector<T>::operator[](size_t index) {
+	if (index >= v_size)
 		throw std::exception("Invalid index!");
 
-	return this->value[index];
+	return value[index];
 }
 
 template<class T>
-size_t vector<T>::Size() const {
-	return this->size;
+size_t vector<T>::size() const {
+	return v_size;
 }
 
 template<class T>
 bool vector<T>::isEmpty() const {
-	return (this->size == 0);
+	return !v_size;
 }
 
 /*void push_back:
@@ -319,25 +388,42 @@ bool vector<T>::isEmpty() const {
 template<class T>
 void vector<T>::push_back(const T& _Val) {
 	/*If we have enough capacity we simply push: */
-	if (size != capacity) {
-		new ((void*)(value + size)) T(_Val);
-		size++;
+	if (v_size != v_capacity) {
+		new ((void*)(value + v_size)) T(_Val);
+		v_size++;
 		return;
 	}
 
-	size_t newCapacity;
+	size_t newCapacity = (v_capacity == 0) ? INITIAL_CAPACITY : v_capacity * GROWTH_CAPACITY;
 
-	if (capacity == 0)
-		newCapacity = INITIAL_CAPACITY;
-	else
-		newCapacity = capacity * GROWTH_CAPACITY;
+	T* newData = copyDynamic(value, v_size, newCapacity);
+	new ((void*)(newData + v_size)) T(_Val);
 
-	T* newData = copyDynamic(this->value, this->size, newCapacity);
-	new ((void*)(newData + size)) T(_Val); //pushing
-	freeRange(value, value + size);
+	freeRange(value, value + v_size);
+
 	value = newData;
-	capacity = newCapacity;
-	size++;
+	v_capacity = newCapacity;
+	v_size++;
+}
+
+template<class T>
+inline void vector<T>::move_back(T&& _value) {
+	if (v_size != v_capacity) {
+		new ((void*)(value + v_size)) T(std::move(_value));
+		v_size++;
+		return;
+	}
+
+	size_t newCapacity = (v_capacity == 0) ? INITIAL_CAPACITY : v_capacity * GROWTH_CAPACITY;
+
+	T* newData = moveDynamic(value, v_size, newCapacity);
+	new ((void*)(newData + v_size)) T(std::move(_value));
+
+	freeRange(value, value + v_size);
+
+	value = newData;
+	v_capacity = newCapacity;
+	v_size++;
 }
 
 /*pop_back:
@@ -349,78 +435,35 @@ void vector<T>::pop_back() {
 	if (this->isEmpty())
 		return;
 
-	(value + size - 1)->~T();
-	size--;
+	(value + v_size - 1)->~T();
+	v_size--;
 }
 
-/*vector<T> operator=:
-* Used copy-and-swap idiom.
-* @param: other is used to get the information in our vector;
-*/
 template<class T>
-vector<T>& vector<T>::operator=(vector<T>& other) noexcept {
-	vector<T> v(other);
-	swapVectors(other);
+vector<T>& vector<T>::operator=(const vector<T>& other) noexcept {
+	if (this != &other) {
+		freeRange(value, value + v_size);
+		value = copyDynamic(other.value, other.v_size, other.v_capacity);
+
+		v_size = other.v_size;
+		v_capacity = other.v_capacity;
+	}
 
 	return *this;
 }
 
-/*move semantics for operator ==*/
 template<class T>
 vector<T>& vector<T>::operator=(vector<T>&& other) noexcept {
 	if (this != &other) {
-		delete[] value; //simple delete[] operator works here
-		this->size = other.size;
+		delete[] value;
+		v_size = other.v_size;
 		value = other.value;
 
 		other.value = nullptr;
-		other.size = 0;
+		other.v_size = 0;
 	}
 
 	return *this;
-}
-
-/*void printAll:
-* Getting all the elements of the vector and writing them in @param: os
-*/
-template<class T>
-void vector<T>::printAll(std::ostream& os) const {
-	for (int i = 0; i < size; i++)
-		os << value[i] << " ";
-}
-
-/*vector operator==:
-* Comparing two vectors, returns true if the're equal
-* and false otherwise.
-*/
-template<class T>
-bool vector<T>::operator==(const vector& other) const {
-	bool _equals = this->size == other.size &&
-		this->size != 0;
-
-	if (_equals) {
-		int size = sizeof(this->value[0]);
-
-		for (int i = 0; i < this->size; i++)
-			_equals = _equals &&
-			memcmp(&this->value[i], &other.value[i], size) == 0;
-
-		return _equals;
-	}
-
-	return false;
-}
-
-template<class T>
-bool vector<T>::operator!=(const vector<T>& other) const {
-	return !(*this == other);
-}
-
-/*used to swap two vectors, via std::swap*/
-template<class T>
-void vector<T>::swapVectors(vector& first) {
-	//using std::swap for copy-and-swap idiom.
-	std::swap(*this, first);
 }
 
 /*void reserve:
@@ -431,58 +474,49 @@ void vector<T>::swapVectors(vector& first) {
 */
 template<class T>
 void vector<T>::reserve(const size_t& newSize) {
-	if (newSize <= capacity)
+	if (newSize <= v_capacity)
 		return;
 
-	T* newData = copyDynamic(this->value, size, newSize);
-	freeRange(value, value + size);
-	this->value = newData;
-	this->capacity = newSize;
+	T* newData = copyDynamic(value, v_size, newSize);
+	freeRange(value, value + v_size);
+	value = newData;
+	v_capacity = newSize;
 }
 
+/*
+Resizes the container to contain count elements
+*/
 template <class T>
 void vector<T>::resize(const size_t& newSize) {
-	if (newSize <= size) {
-		destructRange(value + newSize, value + size);
-		size = newSize;
+	if (newSize <= v_size) {
+		destructRange(value + newSize, value + v_size);
+		v_size = newSize;
 		return;
 	}
 
-	if (newSize <= capacity) {
-		constructRange(value + size, value + newSize);
-		capacity = newSize;
+	if (newSize <= v_capacity) {
+		destructRange(value + newSize, value + v_capacity);
+		v_capacity = newSize;
 		return;
 	}
 
-	size_t newCapacity = newSize;
-	size_t growth = size * GROWTH_CAPACITY;
-
-	if (newCapacity < growth)
-		newCapacity = growth;
-
-	//reserve(newSize); constructRange(this->value + this->size, this->value + newSize); removed!!
-	T* newData = copyDynamic(value, size, newCapacity);
-	freeRange(value, value + size);
+	T* newData = copyDynamic(value, v_size, newSize);
+	constructRange(newData + v_size, newData + newSize);
+	freeRange(value, value + v_size);
 
 	value = newData;
-	capacity = newCapacity;
-	size = newSize;
+	v_capacity = newSize;
+	v_size = newSize;
 }
 
-template <class T>
-inline std::ostream& operator<<(std::ostream& os, const vector<T>& vect) {
-	vect.printAll(os);
-	return os;
-}
-/*clears everything*/
 template <class T>
 void vector<T>::clear() noexcept {
-	this->size = 0;
-	this->capacity = 0;
+	this->v_size = 0;
+	this->v_capacity = 0;
 
-	freeRange(this->value, this->value + this->size);
+	freeRange(value, value + v_size);
 
-	this->value = nullptr;
+	value = nullptr;
 }
 
 /*Inserting an array of objects in
@@ -490,115 +524,120 @@ void vector<T>::clear() noexcept {
 @param list -> the elements we would like to add.
 @param countOfItems -> how many items would we like to add*/
 template <class T>
-void vector<T>::insertList(const size_t& _Where, T* list, const size_t& countOfItems) {
-	if (_Where < 0 || _Where > size)
+void vector<T>::insertList(size_t _Where, const T* list, size_t countOfItems) {
+	if (_Where > v_size)
 		throw std::exception("Invalid index");
 
-	if (size + countOfItems > capacity)
-		reserve(size + countOfItems);
+	if (v_size + countOfItems > v_capacity)
+		reserve(v_size + countOfItems);
 
 	/*Creating memory block capable of holding all the elements and copying the elements
 	* before _Where in*/
-	T* newData = copyDynamic(this->value, _Where, size + countOfItems);
+	T* newData = copyDynamic(value, _Where, v_size + countOfItems);
 
 	/*Getting the elements from list in:*/
 	copyRange(list, list + countOfItems, newData + _Where);
 
 	/*getting the rest of the items in*/
-	copyRange(this->value + _Where, this->value + size, newData + _Where + countOfItems);
+	copyRange(value + _Where, value + v_size, newData + _Where + countOfItems);
 
-	freeRange(this->value, this->value + size);
-	this->value = newData;
-	this->size = this->size + countOfItems;
+	freeRange(value, value + v_size);
+	value = newData;
+	v_size = v_size + countOfItems;
 }
 
 template <class T>
-vector<T> vector<T>::subset(const size_t& from, const size_t& to) const {
-	if (from < 0 || to < 1 ||
-		from > size - 1 || to > size)
-		throw std::exception("Invalid indexes");
-
-	int newSize = to - from - 1;
-	vector<T> toReturn;
-
-	T* data = memalloc(newSize);
-	copyRange(value + from, value + to, data);
-
-	toReturn.insertList(0, data, newSize);
-
-	toReturn.capacity = newSize;
-	return toReturn;
+vector<T> vector<T>::subset(const Iterator& Beg, const Iterator& End) const {
+	vector<int> v(Beg, End);
+	return v;
 }
 
 template<class T>
-vector<T> vector<T>::inclusiveSubset(const size_t& from, const size_t& to) const {
-	return subset(from - 1, to + 1);
+void vector<T>::sort(int from, int to) {
+	assert(from >= 0 && to >= 0 &&
+		to - from < v_size && from <= to);
+
+	qsort(from, to);
 }
 
 template<class T>
-vector<T> vector<T>::leftInclusiveSubset(const size_t& from, const size_t& to) const {
-	return subset(from - 1, to);
-}
-
-template<class T>
-vector<T> vector<T>::rightInclusiveSubset(const size_t& from, const size_t& to) const {
-	return subset(from, to + 1);
+void vector<T>::sort() {
+	sort(0, v_size - 1);
 }
 
 template <class T>
-vector<T> vector<T>::operator+(const vector<T> other) const {
-	size_t newSize = this->size + other.size;
+const vector<T>& vector<T>::operator+(const vector<T>& other) const {
+	size_t newSize = v_size + other.v_size;
 	size_t newCapacity = newSize;
 
 	vector<T> toReturn;
-	toReturn.insertList(0, this->value, this->size);
-	toReturn.insertList(this->size, other.value, other.size);
-	toReturn.size = newSize; toReturn.capacity = newSize;
+	toReturn.insertList(0, value, v_size);
+	toReturn.insertList(v_size, other.value, other.v_size);
+	toReturn.v_size = newSize; toReturn.v_capacity = newSize;
 
 	return toReturn;
 }
 
 template <class T>
-vector<T> vector<T>::intersec(const vector<T> other) const {
-	vector<T> container;
-	for (int i = 0; i < this->size; i++) {
-		for (int j = 0; j < other.size; j++) {
-			if (this->value[i] == other.value[j]) {
-				container.push_back(this->value[i]);
-				break;
-			}
+const vector<T>& vector<T>::intersec(vector<T> other) const {
+	vector<T> currentCopy(*this);
+	currentCopy.sort();
+	other.sort();
+
+	size_t length = other.size() < currentCopy.size() ? other.size() : currentCopy.size();
+
+	size_t fstIdx = 0;
+	size_t sndIdx = 0;
+	size_t resultIdx = 0;
+
+	while (fstIdx < length && sndIdx < length) {
+		if (currentCopy[fstIdx] == other[sndIdx]) {
+			currentCopy[resultIdx++] = currentCopy[fstIdx];
+			++fstIdx;
+			++sndIdx;
 		}
+		else if (currentCopy[fstIdx] > other[sndIdx])
+			++sndIdx;
+		else
+			++fstIdx;
 	}
-	return container;
+
+	currentCopy.resize(resultIdx);
+	return currentCopy;
 }
 
 template<class T>
 vector<T>& vector<T>::operator+=(const vector<T>& other) {
-	for (int i = 0; i < other.size; i++) {
-		this->push_back(other.value[i]);
-	}
+	reserve(v_size + other.v_size);
+	copyRange(other.value, other.value + other.v_size, value + v_size);
+
+	v_size = v_size + other.v_size;
+
 	return *this;
 }
 
-//erasing every element in the vector:
 template<class T>
-inline void vector<T>::erase(const T& obj) {
-	vector<T> toAssign;
-	for (int i = 0; i < size; i++) {
-		if (this->value[i] != obj)
-			toAssign.push_back(this->value[i]);
-	}
+void vector<T>::erase(Iterator at) {
+	if (at == end())
+		return;
 
-	*this = toAssign;
+	const auto& lastElem = --end();
+
+	for (; at != lastElem; ++at)
+		*at = *(++at);
+
+	pop_back();
 }
 
 template<class T>
-size_t vector<T>::Capacity() const {
-	return this->capacity;
+size_t vector<T>::capacity() const {
+	return v_capacity;
 }
 
 template<class T>
 void vector<T>::shrink_to_fit() {
-	destructRange(this->value + this->size, this->value + this->capacity); //TODO -> check efficiency
-	this->capacity = this->size;
+	destructRange(value + v_size, value + v_capacity);
+	v_capacity = v_size;
 }
+
+#endif // !VECTOR_HEADER
