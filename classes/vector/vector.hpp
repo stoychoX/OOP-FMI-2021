@@ -129,7 +129,7 @@ public:
 	const T& operator[] (size_t index) const;
 	T& operator[] (size_t index);
 
-	vector<T> subset(const Iterator& from, const Iterator& to) const;
+	vector<T> subset(Iterator from, Iterator to) const;
 	void sort(int from, int to);
 	void sort();
 
@@ -547,7 +547,7 @@ void vector<T>::insertList(size_t _Where, const T* list, size_t countOfItems) {
 }
 
 template <class T>
-vector<T> vector<T>::subset(const Iterator& Beg, const Iterator& End) const {
+vector<T> vector<T>::subset(Iterator Beg, Iterator End) const {
 	vector<int> v(Beg, End);
 	return v;
 }
