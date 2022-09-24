@@ -82,7 +82,7 @@ void findTests() {
 		int fst = rand() % 1000;
 		int snd = rand() % 1000;
 		if (fst > snd) std::swap(fst, snd);
-		
+
 		if (fst == snd) continue;
 
 		auto beg = v.begin() + fst;
@@ -135,26 +135,31 @@ void intersecTests() {
 }
 
 void subsetTest() {
-	vector<int> v;
 
-	size_t numElems = rand();
+	for (int i = 0; i < 100; i++) {
+		vector<int> v;
 
-	for (size_t i = 0; i < numElems; i++)
-		v.push_back(rand() % 10000);
+		size_t numElems = rand();
 
-	int fst = rand() % numElems;
-	int snd = rand() % numElems;
+		for (size_t i = 0; i < numElems; i++)
+			v.push_back(rand() % 10000);
 
-	if (fst > snd)
-		std::swap(fst, snd);
+		int fst = rand() % numElems;
+		int snd = rand() % numElems;
 
-	auto subset = v.subset(v.begin() + fst, v.begin() + snd);
+		if (fst > snd)
+			std::swap(fst, snd);
 
-	auto vBeg = v.begin();
-	auto sBeg = subset.begin();
+		auto subset = v.subset(v.begin() + fst, v.begin() + snd);
 
-	for (; sBeg != subset.end(); ++sBeg, ++vBeg)
-		assert(*sBeg == *vBeg);
+		auto vBeg = v.begin() + fst;
+		auto sBeg = subset.begin();
+
+		assert(subset.size() == snd - fst);
+
+		for (; sBeg != subset.end(); ++sBeg, ++vBeg)
+			assert(*sBeg == *vBeg);
+	}
 }
 
 void runAllAsync() {
@@ -177,7 +182,7 @@ void runAllAsync() {
 }
 
 int main() {
-	runAllAsync(); 
+	runAllAsync();
 	// 4.69 s
 	// on Intel CORE i5 10th GEN
 	// compiled on MSVC x86 (Debug)
