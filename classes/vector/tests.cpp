@@ -36,7 +36,7 @@ void pushBackTests() {
 
 	assert(v.size() == 1000);
 
-	for (size_t i = 0; i < 1000; i++)
+	for (int i = 0; i < 1000; i++)
 		assert(v[i] == i);
 }
 
@@ -53,7 +53,7 @@ void insertListTest() {
 
 	delete[] arr;
 
-	for (size_t i = 0; i < 1500; i++)
+	for (int i = 0; i < 1500; i++)
 		assert(v[i] == i);
 }
 
@@ -135,7 +135,6 @@ void intersecTests() {
 }
 
 void subsetTest() {
-
 	for (int i = 0; i < 100; i++) {
 		vector<int> v;
 
@@ -144,8 +143,8 @@ void subsetTest() {
 		for (size_t i = 0; i < numElems; i++)
 			v.push_back(rand() % 10000);
 
-		int fst = rand() % numElems;
-		int snd = rand() % numElems;
+		size_t fst = rand() % numElems;
+		size_t snd = rand() % numElems;
 
 		if (fst > snd)
 			std::swap(fst, snd);
@@ -182,8 +181,11 @@ void runAllAsync() {
 }
 
 int main() {
+	std::cout << "Start tests...\n";
 	runAllAsync();
+	std::cout << "No assertions failed!";
+
 	// 4.69 s
 	// on Intel CORE i5 10th GEN
-	// compiled on MSVC x86 (Debug)
+	// compiled under MSVC & g++ 12
 }

@@ -6,12 +6,12 @@
 #ifndef VECTOR_HEADER
 #define VECTOR_HEADER
 
-const size_t INITIAL_CAPACITY = 16;
-const size_t GROWTH_CAPACITY = 2;
-
-#include<exception>
+#include<stdexcept>
 #include<cassert>  
 #include<cstddef> // size_t
+
+const size_t INITIAL_CAPACITY = 16;
+const size_t GROWTH_CAPACITY = 2;
 
 template <class T>
 class vector {
@@ -23,7 +23,7 @@ private:
 		using refType = valType&;
 
 	public:
-		vector_iterator(pntType passedVal) : memPointer{passedVal} {};
+		vector_iterator(pntType passedVal) : memPointer{ passedVal } {};
 		vector_iterator(pntType passedVal, size_t _push) : memPointer{ passedVal + _push } {};
 
 		vector_iterator& operator++() {
@@ -48,9 +48,9 @@ private:
 			return it;
 		}
 
-		vector_iterator& operator+(int off) const {
-			vector_iterator res{ memPointer + off };
-			return res;
+		vector_iterator operator+(int off) const {
+			vector_iterator toReturn{ memPointer + off };
+			return toReturn;
 		}
 
 		pntType operator->() {
@@ -70,7 +70,7 @@ private:
 		}
 
 		bool operator==(const vector_iterator& it) const {
-			return (this->memPointer == it.memPointer);
+			return (memPointer == it.memPointer);
 		}
 
 		bool operator!=(const vector_iterator& it) const {
@@ -121,8 +121,8 @@ public:
 	void pop_back();
 	void insertList(size_t _Where, const T* list, size_t sizeOfItems);
 
-	const vector<T>& operator+(const vector<T>& other) const;
-	const vector<T>& intersec(vector<T> other) const;
+	vector<T> operator+(const vector<T>& other) const;
+	vector<T> intersec(vector<T> other) const;
 	vector<T>& operator+=(const vector<T>& other);
 	void erase(Iterator at);
 
@@ -141,24 +141,24 @@ public:
 		return Iterator(value + v_size);
 	}
 
-	const Iterator& begin() const {
+	const Iterator begin() const {
 		return Iterator(value);
 	}
 
-	const Iterator& end() const {
+	const Iterator end() const {
 		return Iterator(value + v_size);
 	}
 
-	const Iterator& c_begin() const {
+	const Iterator c_begin() const {
 		return Iterator(value);
 	}
 
-	const Iterator& c_end() const {
+	const Iterator c_end() const {
 		return Iterator(value + v_size);
 	}
 
-	const Iterator& find(Iterator beginRange, Iterator endRange, const T& item) const;
-	const Iterator& find(const T&) const;
+	Iterator find(Iterator beginRange, Iterator endRange, const T& item) const;
+	Iterator find(const T&) const;
 	bool contains(const T& elem) const;
 
 	int distance(const Iterator& Beg, const Iterator& End) const;
@@ -301,7 +301,7 @@ vector<T>::vector(Iterator Beg, Iterator End) {
 }
 
 template<class T>
-const typename vector<T>::Iterator& vector<T>::find(Iterator Beg, Iterator End, const T& item) const {
+typename vector<T>::Iterator vector<T>::find(Iterator Beg, Iterator End, const T& item) const {
 	for (; Beg != End; ++Beg)
 		if (*Beg == item)
 			return Beg;
@@ -310,7 +310,7 @@ const typename vector<T>::Iterator& vector<T>::find(Iterator Beg, Iterator End, 
 }
 
 template<class T>
-const typename vector<T>::Iterator& vector<T>::find(const T& item) const {
+typename vector<T>::Iterator vector<T>::find(const T& item) const {
 	return find(begin(), end(), item);
 }
 
@@ -356,7 +356,7 @@ int vector<T>::distance(const Iterator& Beg, const Iterator& End) const {
 template<class T>
 const T& vector<T>::operator[](size_t index) const {
 	if (index >= v_size)
-		throw std::exception("Invalid index!");
+		throw std::runtime_error("Invalid index!");
 
 	return value[index];
 }
@@ -364,7 +364,7 @@ const T& vector<T>::operator[](size_t index) const {
 template<class T>
 T& vector<T>::operator[](size_t index) {
 	if (index >= v_size)
-		throw std::exception("Invalid index!");
+		throw std::runtime_error("Invalid index!");
 
 	return value[index];
 }
@@ -526,7 +526,7 @@ void vector<T>::clear() noexcept {
 template <class T>
 void vector<T>::insertList(size_t _Where, const T* list, size_t countOfItems) {
 	if (_Where > v_size)
-		throw std::exception("Invalid index");
+		throw std::runtime_error("Invalid index");
 
 	if (v_size + countOfItems > v_capacity)
 		reserve(v_size + countOfItems);
@@ -555,7 +555,7 @@ vector<T> vector<T>::subset(Iterator Beg, Iterator End) const {
 template<class T>
 void vector<T>::sort(int from, int to) {
 	assert(from >= 0 && to >= 0 &&
-		to - from < v_size && from <= to);
+		to - from < v_size&& from <= to);
 
 	qsort(from, to);
 }
@@ -566,7 +566,7 @@ void vector<T>::sort() {
 }
 
 template <class T>
-const vector<T>& vector<T>::operator+(const vector<T>& other) const {
+vector<T> vector<T>::operator+(const vector<T>& other) const {
 	size_t newSize = v_size + other.v_size;
 	size_t newCapacity = newSize;
 
@@ -579,7 +579,7 @@ const vector<T>& vector<T>::operator+(const vector<T>& other) const {
 }
 
 template <class T>
-const vector<T>& vector<T>::intersec(vector<T> other) const {
+vector<T> vector<T>::intersec(vector<T> other) const {
 	vector<T> currentCopy(*this);
 	currentCopy.sort();
 	other.sort();
