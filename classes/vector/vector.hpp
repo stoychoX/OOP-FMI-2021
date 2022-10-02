@@ -65,10 +65,6 @@ private:
 			return *(memPointer);
 		}
 
-		const refType operator*() const {
-			return *(memPointer);
-		}
-
 		bool operator==(const vector_iterator& it) const {
 			return (memPointer == it.memPointer);
 		}
@@ -89,8 +85,53 @@ private:
 		friend class vector;
 	};
 
+	class const_vector_iterator {
+		public:
+		using valType = T;
+		using pntType = valType const*;
+		using refType = valType const&;
+
+	public:
+		const_vector_iterator(pntType passedVal) : memPointer{ passedVal } {}
+		const_vector_iterator(pntType passedVal, size_t _push) : memPointer{ passedVal + _push } {}
+
+		const_vector_iterator operator+(int off) const {
+			const_vector_iterator toReturn{ memPointer + off };
+			return toReturn;
+		}
+
+		const pntType operator->() const noexcept {
+			return memPointer;
+		}
+
+		refType operator*() const noexcept {
+			return *(memPointer);
+		}
+
+		bool operator==(const const_vector_iterator& it) const {
+			return (memPointer == it.memPointer);
+		}
+
+		bool operator!=(const const_vector_iterator& it) const {
+			return !(memPointer == it.memPointer);
+		}
+
+		bool operator>(const const_vector_iterator& other) const {
+			return memPointer > other.memPointer;
+		}
+
+		bool operator<(const const_vector_iterator& other) const {
+			return memPointer < other.memPointer;
+		}
+		
+	private:
+		pntType memPointer;
+		friend class vector;
+	};
+
 public:
 	using Iterator = vector_iterator;
+	using cIterator = const_vector_iterator;
 
 private:
 	T* value;
@@ -141,24 +182,28 @@ public:
 		return Iterator(value + v_size);
 	}
 
-	const Iterator begin() const {
-		return Iterator(value);
+	cIterator begin() const {
+		return cIterator(value);
 	}
 
-	const Iterator end() const {
-		return Iterator(value + v_size);
+	cIterator end() const {
+		return cIterator(value + v_size);
 	}
 
-	const Iterator c_begin() const {
-		return Iterator(value);
+	cIterator c_begin() const {
+		return cIterator(value);
 	}
 
-	const Iterator c_end() const {
-		return Iterator(value + v_size);
+	cIterator c_end() const {
+		return cIterator(value + v_size);
 	}
 
-	Iterator find(Iterator beginRange, Iterator endRange, const T& item) const;
-	Iterator find(const T&) const;
+	Iterator find(Iterator, Iterator, const T&);
+	Iterator find(const T&);
+
+	cIterator find(Iterator, cIterator, const T&) const;
+	cIterator find(const T&) const;
+
 	bool contains(const T& elem) const;
 
 	int distance(const Iterator& Beg, const Iterator& End) const;
@@ -301,7 +346,7 @@ vector<T>::vector(Iterator Beg, Iterator End) {
 }
 
 template<class T>
-typename vector<T>::Iterator vector<T>::find(Iterator Beg, Iterator End, const T& item) const {
+typename vector<T>::Iterator vector<T>::find(Iterator Beg, Iterator End, const T& item) {
 	for (; Beg != End; ++Beg)
 		if (*Beg == item)
 			return Beg;
@@ -310,13 +355,30 @@ typename vector<T>::Iterator vector<T>::find(Iterator Beg, Iterator End, const T
 }
 
 template<class T>
-typename vector<T>::Iterator vector<T>::find(const T& item) const {
+typename vector<T>::Iterator vector<T>::find(const T& item) {
+	return find(begin(), end(), item);
+}
+
+template<class T>
+typename vector<T>::cIterator vector<T>::find(Iterator Beg, cIterator End, const T& item) const {
+	for (; Beg != End; ++Beg)
+		if (*Beg == item)
+			return Beg;
+
+	return c_end();
+}
+
+template<class T>
+typename vector<T>::cIterator vector<T>::find(const T& item) const {
 	return find(begin(), end(), item);
 }
 
 template<class T>
 bool vector<T>::contains(const T& elem) const {
-	return find(begin(), end(), elem) != end();
+	for (size_t i = 0; i < v_size; ++i)
+		if(value[i] == elem)
+			return true;
+	return false;
 }
 
 template<class T>

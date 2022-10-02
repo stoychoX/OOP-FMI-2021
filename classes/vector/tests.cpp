@@ -187,5 +187,5 @@ int main() {
 
 	// 4.69 s
 	// on Intel CORE i5 10th GEN
-	// compiled under MSVC & g++ 12
+	// compiles under MSVC, g++, clang
 }
