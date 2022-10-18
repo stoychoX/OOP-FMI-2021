@@ -1,197 +1,168 @@
 /****************************************
 Linked queue implementation.
-
-19.09.2021
+created: 19.09.2021
+updated: 18.10.2022
 ******************************************/
 
-#include<exception>
-#ifndef LINKED_QUEUE
-#define LINKDE_QUEUE
+#ifndef LINKED_QUEUE_IMPL
+#define LINKED_QUEUE_IMPL
 
-#define MAXSIZE 100
-
-template<class T>
-struct Node {
-	T data;
-	Node* next;
-
-	Node(const T& arg, Node* next = nullptr) :
-		data(arg),
-		next(next) {}
-};
+#include<cstddef>
 
 template<class T>
-class queue {
+class LinkedQueue {
 private:
-	Node<T>* head;
-	Node<T>* tail;
+    struct LinkedNode {
+        T data;
+        LinkedNode* next;
 
-	int size;
+        LinkedNode(const T& argData, LinkedNode* argNext = nullptr) : data {argData}, next{argNext} {} 
+    };
+
+    LinkedNode* head;                   // Последния добавен елемент в опашката
+    LinkedNode* tail;                   // Първия добавен елемент в опашката
+    size_t queueSize;
+
+    void copy(const LinkedQueue<T>&);
+    void free();
+
 public:
-	//construct:
-	queue();
-	queue(const queue<T>& other);
-	queue(queue<T>&& other);
+    LinkedQueue();
+    
+    LinkedQueue(const LinkedQueue<T>&);
+    LinkedQueue& operator=(const LinkedQueue<T>&);
 
-	//operator=
-	queue<T>& operator=(const queue<T>& other);
-	queue<T>& operator=(queue<T>&& other);
+    LinkedQueue(LinkedQueue<T>&&) noexcept;
+    LinkedQueue& operator=(LinkedQueue<T>&&) noexcept;
 
-	//funcs
-	void enqueue(const T& arg);
-	T dequeue();
-	const T& top() const;
+    void push(const T&);
+    void pop();
+    const T& front() const;
 
-	//indicators full/empty
-	bool isEmpty() const;
-	bool isFull() const;
+    bool empty() const;
 
-	void clear();
+    size_t size() const;
 
-	//destruct:
-	~queue();
-private:
-	//helpers
-	void free();
-	void copy(const queue<T>& other);
+    ~LinkedQueue();
 };
 
-#endif //!LINKED_QUEUE
+template<class T>
+LinkedQueue<T>::LinkedQueue() : head {nullptr}, tail{nullptr}, queueSize{0} {}
 
 template<class T>
-inline queue<T>::queue() : head(nullptr), tail(nullptr), size(0) {}
-
-template<class T>
-inline queue<T>::queue(const queue<T>& other) {
-	copy(other);
+LinkedQueue<T>::LinkedQueue(const LinkedQueue<T>& other) {
+    copy(other);
 }
 
 template<class T>
-inline queue<T>::queue(queue<T>&& other) {
-	this->head = other.head;
-	this->tail = other.tail;
-	this->size = other.size;
+LinkedQueue<T>& LinkedQueue<T>::operator=(const LinkedQueue<T>& other) {
+    if(this != &other){
+        free();
+        copy(other);
+    }
 
-	other.head = other.tail = nullptr;
-	other.size = 0;
+    return *this;
 }
 
 template<class T>
-inline queue<T>& queue<T>::operator=(const queue<T>& other) {
-	if (this != &other) {
-		free();
-		copy(other);
-	}
+LinkedQueue<T>::LinkedQueue(LinkedQueue<T>&& other) noexcept {
+    head = other.head;
+    tail = other.tail;
+    size = other.size;
 
-	return *this;
+    other.head = nullptr;
+    other.tail = nullptr;
 }
 
 template<class T>
-inline queue<T>& queue<T>::operator=(queue<T>&& other) {
-	if(this!=&other){
-	clear();
+LinkedQueue<T>& LinkedQueue<T>::operator=(LinkedQueue<T>&& other) noexcept {
+    if(this != &other) {
+        head = other.head;
+        tail = other.tail;
+        size = other.size;
 
-	this->head = other.head;
-	this->tail = other.tail;
-	this->size = other.size;
-
-	other.head = other.tail = nullptr;
-	other.size = 0;
-	}
-
-	return *this;
+        other.head = nullptr;
+        other.tail = nullptr;
+    }
+    return *this;
 }
 
 template<class T>
-inline void queue<T>::enqueue(const T& arg) {
-	//we add at tail
-	if (isFull())
-		throw std::domain_error("Queue is full");
+void LinkedQueue<T>::copy(const LinkedQueue<T>& other) {
+    LinkedNode* iter = other.head;
 
-	Node<T>* toAdd = new Node<T>(arg);
-
-	if (isEmpty()) {
-		head = toAdd;
-		tail = toAdd;
-	}
-	else {
-		tail->next = toAdd;
-		tail = toAdd;
-	}
-	++size;
+    while(iter) {
+        push(iter->data);
+        iter = iter->next;
+    }
 }
 
 template<class T>
-inline T queue<T>::dequeue() {
-	//we remove at head
-	if (isEmpty())
-		throw std::domain_error("Queue is empty");
-
-	Node<T>* toRemove = head;
-	head = head->next;
-	T toReturn = toRemove->data;
-	delete toRemove;
-	--size;
-
-	if (isEmpty())
-		tail = nullptr;
-
-	return toReturn;
+void LinkedQueue<T>::free() {
+    LinkedNode* iter = head;
+    while(iter) {
+        LinkedNode* removeMe = iter;
+        iter = iter->next;
+        delete removeMe;
+    }
 }
 
 template<class T>
-inline const T& queue<T>::top() const {
-	if (isEmpty())
-		throw std::domain_error("Queue is empty");
-
-	return head->data;
+bool LinkedQueue<T>::empty() const {
+    return head == nullptr;
 }
 
 template<class T>
-inline bool queue<T>::isEmpty() const {
-	return (size == 0);
+size_t LinkedQueue<T>::size() const {
+    return queueSize;
 }
 
 template<class T>
-inline bool queue<T>::isFull() const {
-	return (size == MAXSIZE);
+void LinkedQueue<T>::push(const T& elem) {
+    LinkedNode* toPush = new LinkedNode(elem);
+    if(empty()) {
+        tail = toPush;
+        head = toPush;
+    }
+    else {
+        tail->next = toPush;
+        tail = toPush;
+    }
+
+    ++queueSize;
 }
 
 template<class T>
-inline void queue<T>::clear() {
-	free();
+void LinkedQueue<T>::pop() {
+    if(empty()) {
+        throw "Empty queue";
+    }
+    else if(head == tail) {
+        delete head;
+        head = nullptr;
+        tail = nullptr;
+    }
+    else {
+        LinkedNode* deleteMe = head;
+        head = head->next;
+        delete deleteMe;
+    }
 
-	tail = head = nullptr;
-	size = 0;
+    --queueSize;
 }
 
 template<class T>
-inline queue<T>::~queue() {
-	free();
+const T& LinkedQueue<T>::front() const {
+    if(empty()){
+        throw "Empty queue";
+    }
+
+    return head->data;
 }
 
 template<class T>
-inline void queue<T>::free() {
-	while (head) {
-		Node<T>* toRemove = head;
-		head = head->next;
-		delete toRemove;
-	}
+LinkedQueue<T>::~LinkedQueue() {
+    free();
 }
 
-template<class T>
-inline void queue<T>::copy(const queue<T>& other) {
-	try {
-		Node<T>* iterator = other.head;
-
-		while (iterator) {
-			T arg = iterator->data;
-			this->enqueue(arg);
-			iterator = iterator->next;
-		}
-	}
-	catch (...) {
-		clear();
-		throw;
-	}
-}
+#endif
